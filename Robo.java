@@ -1,13 +1,13 @@
-public class Robo {
-    public int codigo;
-    public String nome;
-    public int ataque;
-    public int defesa;
-    public int energia;
-    public int vitorias;
-    public int derrotas;
-    public int empate;
-    public int pontos;
+public abstract class Robo {
+    private int codigo;
+    private String nome;
+    private int ataque;
+    private int defesa;
+    private int energia;
+    private int vitorias;
+    private int derrotas;
+    private int empate;
+    private int pontos;
 
     Robo(int codigo, String nome, int ataque, int defesa) {
         this.codigo = codigo;
@@ -21,18 +21,107 @@ public class Robo {
         this.pontos = 0;
     }
 
-    int calcularDano(Robo adversario, int rodada) {
-        int dano = ataque - adversario.defesa;
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public int getAtaque() {
+        return ataque;
+    }
+
+    public int getDefesa() {
+        return defesa;
+    }
+
+    public int getEnergia() {
+        return energia;
+    }
+
+    public int getVitorias() {
+        return vitorias;
+    }
+
+    public int getDerrotas() {
+        return derrotas;
+    }
+
+    public int getEmpate() {
+        return empate;
+    }
+
+    public int getPontos() {
+        return pontos;
+    }
+
+    public abstract String getTipo();
+
+    public int getAtaqueEfetivo() {
+        return ataque;
+    }
+
+    public int ajustarDanoRecebido(int dano) {
+        return dano;
+    }
+
+    public int calcularDano(Robo alvo, int rodada) {
+        int dano = getAtaqueEfetivo() - alvo.getDefesa();
         if (dano < 5) {
             dano = 5;
         }
         if (rodada % 2 == 0) {
             dano += 5;
         }
-        return dano;
+        return alvo.ajustarDanoRecebido(dano);
     }
 
-    void exibirDados() {
+    public boolean estaDisponivel() {
+        return energia >= 30;
+    }
+
+    public void receberDano(int dano) {
+        energia = energia - dano;
+        if (energia < 0) {
+            energia = 0;
+        }
+    }
+
+    public void registrarVitoria() {
+        vitorias++;
+        pontos = pontos + 3;
+    }
+
+    public void registrarDerrota() {
+        derrotas++;
+    }
+
+    public void registrarEmpate() {
+        empate++;
+        pontos = pontos + 1;
+    }
+
+    public boolean recuperarEnergia(int quantidade) {
+        if (quantidade <= 0 || quantidade % 10 != 0) {
+            return false;
+        }
+        int custo = quantidade / 10;
+        if (custo > pontos) {
+            return false;
+        }
+        if (energia + quantidade > 100) {
+            return false;
+        }
+        energia = energia + quantidade;
+        pontos = pontos - custo;
+        return true;
+    }
+
+    public void exibirDados() {
+        System.out.println("--------------------------");
+        System.out.println("Tipo: " + getTipo());
         System.out.println("Codigo: " + codigo);
         System.out.println("Nome: " + nome);
         System.out.println("Ataque: " + ataque);
@@ -42,37 +131,13 @@ public class Robo {
         System.out.println("Derrotas: " + derrotas);
         System.out.println("Empates: " + empate);
         System.out.println("Pontos: " + pontos);
-        if (energia >= 30) {
+        if (estaDisponivel()) {
+            System.out.println("--------------------------");
             System.out.println("Disponivel");
         } else {
+            System.out.println("--------------------------");
             System.out.println("Em recuperacao");
         }
         System.out.println();
-    }
-
-    void receberDano(int dano) {
-        energia = energia - dano;
-        if (energia < 0) {
-            energia = 0;
-        }
-    }
-
-    void registrarVitoria() {
-        vitorias++;
-        pontos = pontos + 3;
-    }
-
-    void registrarDerrota() {
-        derrotas++;
-    }
-
-    void registrarEmpate() {
-        empate++;
-        pontos = pontos + 1;
-    }
-
-        void recuperarEnergia(int quantidade) {
-        energia = energia + quantidade;
-        pontos = pontos - quantidade / 10;
     }
 }
